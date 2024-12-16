@@ -1,6 +1,7 @@
 package com.beauver.discord.bots
 
 import com.beauver.discord.bots.Classes.Quote
+import com.beauver.discord.bots.Commands.GetQuote
 import com.beauver.discord.bots.Commands.GetQuoteAutomated
 import com.beauver.discord.bots.Commands.SetAutomatedQuote
 import io.github.cdimascio.dotenv.Dotenv
@@ -24,6 +25,7 @@ fun startBot(){
         .setActivity(Activity.competing("in the war against viktor!"))
         .addEventListeners(
             GetQuoteAutomated(),
+            GetQuote(),
             SetAutomatedQuote(),
         )
         .build();
@@ -41,6 +43,7 @@ fun setupEnv(){
 fun registerCommands(){
     bot!!.updateCommands().addCommands(
         GetQuoteAutomated().getCommand(),
+        GetQuote().getCommand(),
         SetAutomatedQuote().getCommand()
     ).queue();
 }

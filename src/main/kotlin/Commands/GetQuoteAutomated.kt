@@ -30,6 +30,8 @@ class GetQuoteAutomated : ListenerAdapter() {
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        if(event.name != "quote") return
+
         var ephemeral = true
 
         if (event.getOption("ephemeral") != null) {
@@ -46,22 +48,22 @@ class GetQuoteAutomated : ListenerAdapter() {
     }
 
     fun qotd(ephemeral:Boolean, event: SlashCommandInteractionEvent) {
-        var embed = Database.currentQotd!!.toEmbed()
+        var embed = Database.currentQotd!!.toEmbed(event.user)
         event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
     }
 
     fun qotw(ephemeral:Boolean, event: SlashCommandInteractionEvent) {
-        var embed = Database.currentQotw!!.toEmbed()
+        var embed = Database.currentQotw!!.toEmbed(event.user)
         event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
     }
 
     fun qotm(ephemeral:Boolean, event: SlashCommandInteractionEvent) {
-        var embed = Database.currentQotm!!.toEmbed()
+        var embed = Database.currentQotm!!.toEmbed(event.user)
         event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
     }
 
     fun qoty(ephemeral:Boolean, event: SlashCommandInteractionEvent) {
-        var embed = Database.currentQoty!!.toEmbed()
+        var embed = Database.currentQoty!!.toEmbed(event.user)
         event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
     }
 

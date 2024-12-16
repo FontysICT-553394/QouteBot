@@ -29,6 +29,7 @@ class SetAutomatedQuote : ListenerAdapter() {
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        if(event.name != "set-quote") return
         event.reply("Skill issue (not yet implemented)").setEphemeral(true).queue()
     }
 

@@ -7,7 +7,6 @@ class DiscordUser {
     var userId: Long? = null
     var displayName: String? = null
     var avatarUrl: String? = null
-    val quotes: MutableList<Quote> = mutableListOf()
 
     //<editor-fold desc="Constructors & Overloading>
     /**
@@ -43,11 +42,4 @@ class DiscordUser {
     }
     //</editor-fold>
 
-    fun addQuote(quote: Quote) {
-        this.quotes.add(quote)
-    }
-
-    fun removeQuote(quote: Quote) {
-        this.quotes.remove(quote)
-    }
 }

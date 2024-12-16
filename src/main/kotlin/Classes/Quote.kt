@@ -4,6 +4,7 @@ import com.beauver.discord.bots.Instance
 import com.beauver.discord.bots.Enums.QuoteType
 import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.User
 import java.awt.Color
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -93,14 +94,15 @@ class Quote {
      * @param color The color of the embed, defaults to green
      * @return Embed
      */
-    fun toEmbed(color: Color = Color.GREEN): EmbedBuilder{
+    fun toEmbed(requester: User, color: Color = Color.GREEN): EmbedBuilder{
         val embed = EmbedBuilder()
         embed.setTitle("Quote ${if(quoteId == null) "" else quoteId}:")
         embed.setDescription(quote)
         embed.setColor(color)
 
         if(sender != null && !isAutomatedQuote) {
-            embed.setFooter(sender!!.displayName)
+            embed.setThumbnail(sender!!.avatarUrl)
+            embed.setFooter(requester.effectiveName, requester.effectiveAvatarUrl)
             embed.addField("Sender:", sender!!.displayName!!, true)
 
             val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy");
@@ -112,6 +114,7 @@ class Quote {
         }
 
         if(isAutomatedQuote){
+            embed.setFooter(requester.effectiveName, requester.effectiveAvatarUrl)
             embed.setThumbnail(Instance.env!!.get("BOT_PFP"))
             embed.addField("Sender:", "QuoteBot", true)
             when(quoteType){
