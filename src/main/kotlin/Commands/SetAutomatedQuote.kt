@@ -15,7 +15,6 @@ class SetAutomatedQuote : ListenerAdapter() {
     fun getCommand(): CommandData{
         val optionData = OptionData(OptionType.STRING, "quote", "Type of quote you want to modify", true)
             .addChoice("Quote of the day", "qotd")
-            .addChoice("Quote of the week", "qotw")
             .addChoice("Quote of the month", "qotm")
             .addChoice("Quote of the year", "qoty")
 

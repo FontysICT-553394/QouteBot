@@ -4,6 +4,7 @@ import com.beauver.discord.bots.Classes.DiscordUser
 import com.beauver.discord.bots.Classes.Quote
 import com.beauver.discord.bots.Enums.QuoteType
 import com.beauver.discord.bots.Instance
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date
 import net.dv8tion.jda.api.entities.User
 import java.sql.Connection
 import java.sql.Date
@@ -17,12 +18,12 @@ class Database {
 
 
     companion object{
+        val userCache = mutableMapOf<Long, User>()
         private val jdbc = "jdbc:mysql://${Instance.env!!.get("DB_IP")}:${Instance.env!!.get("DB_PORT")}/${Instance.env!!.get("DB_NAME")}"
 
-        val currentQotd: Quote = getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli()))
-        val currentQotw: Quote = getAutomaticQuoteDatabase(QuoteType.WEEK, Date(Instant.now().toEpochMilli()))
-        val currentQotm: Quote = getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli()))
-        val currentQoty: Quote = getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli()))
+        val currentQotd: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli())) }
+        val currentQotm: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli())) }
+        val currentQoty: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli())) }
 
         private fun getConnection(): Connection {
             return DriverManager.getConnection(jdbc, Instance.env!!.get("DB_USER"), Instance.env!!.get("DB_PWD"));
@@ -108,6 +109,23 @@ class Database {
             }
         }
 
+        fun addUserQuote(quote: Quote){
+            val conn = getConnection()
+
+            val stmt = conn.prepareStatement(
+                "INSERT INTO quotes(quote, sender_id, guild_id, date, quote_type, automated) " +
+                        "VALUES (?,?,?,?,'USER',false)")
+
+            stmt.setString(1, quote.quote)
+            stmt.setLong(2, quote.sender!!.userId!!.toLong())
+            stmt.setString(3, quote.guildId)
+            stmt.setDate(4, Date(quote.dateSaid!!.time))
+
+            if(stmt.executeUpdate() <= 0){
+                throw RuntimeException("Quote could not be created.")
+            }
+        }
+
         private fun getAutomaticQuoteDatabase(quoteType: QuoteType, date: Date): Quote {
             val conn = getConnection()
 
@@ -115,10 +133,16 @@ class Database {
                 "SELECT * FROM quotes " +
                         "WHERE automated = true " +
                         "AND quote_type = ? " +
-                        "AND date = ?;"
+                        "AND DATE_FORMAT(date, '%Y-%m-%d') LIKE ?"
             )
-            stmt.setString(1, quoteType.toString());
-            stmt.setString(2, SimpleDateFormat("yyyy/MM/dd").format(date));
+            stmt.setString(1, quoteType.toString().uppercase());
+
+            when(quoteType) {
+                QuoteType.DAY -> stmt.setString(2, "%" + SimpleDateFormat("yyyy-MM-dd").format(date) + "%");
+                QuoteType.MONTH -> stmt.setString(2, "%" + SimpleDateFormat("yyyy-MM").format(date) + "%");
+                QuoteType.YEAR -> stmt.setString(2, "%" + SimpleDateFormat("yyyy").format(date) + "%");
+                else -> "";
+            }
             val rs = stmt.executeQuery()
 
             if(rs.next()){
@@ -134,14 +158,20 @@ class Database {
             }
         }
 
-        //TODO: move to hashmap
+        //Hopefully getting around rate limit, no clue if this'll work
         private fun getUserFromId(userId: Long): User {
+            val customCache = userCache[userId]
+            if (customCache != null) {
+                return customCache
+            }
             val cachedUser = Instance.bot!!.getUserById(userId)
             if (cachedUser != null) {
                 return cachedUser
             }
 
-            return Instance.bot!!.retrieveUserById(userId).complete()
+            val retrievedUser = Instance.bot!!.retrieveUserById(userId).complete()
+            userCache.put(userId, retrievedUser)
+            return retrievedUser
         }
     }
 

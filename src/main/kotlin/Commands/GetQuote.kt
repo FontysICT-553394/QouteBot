@@ -6,6 +6,7 @@ import com.beauver.discord.bots.Database.Database
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.IntegrationType
 import net.dv8tion.jda.api.interactions.InteractionContextType
@@ -35,6 +36,10 @@ class GetQuote : ListenerAdapter() {
             .addOption(OptionType.BOOLEAN, "ephemeral", "Whether you want your message to be sent only to you or everyone.")
     }
 
+    fun getUserCommand(): CommandData {
+        return Commands.user("Get user quotes")
+    }
+
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if(event.name != "quote-user") {
             return
@@ -51,6 +56,14 @@ class GetQuote : ListenerAdapter() {
             "id" -> idQuote(event, ephemeral)
             "matching" -> matchingQuote(event, ephemeral)
         }
+    }
+
+    override fun onUserContextInteraction(event: UserContextInteractionEvent) {
+        if(event.name != "Get user quotes") return
+
+        val embed = getAllReasonEmbed(event.target)
+        embed.setFooter(event.user.effectiveName, event.user.effectiveAvatarUrl)
+        event.replyEmbeds(embed.build()).setEphemeral(true).queue()
     }
 
     private fun randomQuote(event: SlashCommandInteractionEvent, ephemeral: Boolean) {
@@ -127,20 +140,25 @@ class GetQuote : ListenerAdapter() {
 
     private fun allQuotes(event: SlashCommandInteractionEvent, ephemeral: Boolean){
         val user: User = event.getOption("target")!!.asUser
+
+        val embed = getAllReasonEmbed(user)
+        embed.setFooter(event.user.effectiveName, event.user.effectiveAvatarUrl)
+        event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
+    }
+
+    private fun getAllReasonEmbed(user: User): EmbedBuilder {
         val quotes = Database.getUserQuotes(DiscordUser(user))
 
         val embed = EmbedBuilder()
         embed.setTitle("${user.effectiveName}'s quotes:")
         embed.setDescription("This user has ${quotes.count()} quotes.")
+        embed.setThumbnail(user.effectiveAvatarUrl)
         embed.setColor(Color.GREEN)
-        embed.setFooter(event.user.effectiveName, event.user.effectiveAvatarUrl)
 
-        var counter = 1;
         quotes.forEach { quote ->
-            embed.addField("Quote $counter:", quote.quote!!,true)
-            counter++;
+            embed.addField("Quote ${quote.quoteId}:", quote.quote!!,true)
         }
-        event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
+        return embed
         // implement page stuff later
     }
 }

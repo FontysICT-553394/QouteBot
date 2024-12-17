@@ -1,6 +1,7 @@
 package com.beauver.discord.bots
 
 import com.beauver.discord.bots.Classes.Quote
+import com.beauver.discord.bots.Commands.AddQuote
 import com.beauver.discord.bots.Commands.GetQuote
 import com.beauver.discord.bots.Commands.GetQuoteAutomated
 import com.beauver.discord.bots.Commands.SetAutomatedQuote
@@ -18,6 +19,7 @@ fun main() {
     setupEnv()
     startBot()
     registerCommands()
+//    registerTestCmds()
 }
 
 fun startBot(){
@@ -26,6 +28,7 @@ fun startBot(){
         .addEventListeners(
             GetQuoteAutomated(),
             GetQuote(),
+            AddQuote(),
             SetAutomatedQuote(),
         )
         .build();
@@ -43,15 +46,35 @@ fun setupEnv(){
 fun registerCommands(){
     bot!!.updateCommands().addCommands(
         GetQuoteAutomated().getCommand(),
+
         GetQuote().getCommand(),
+        GetQuote().getUserCommand(),
+
+        AddQuote().getCommand(),
+        AddQuote().getMessageContextCommand(),
+
         SetAutomatedQuote().getCommand()
     ).queue();
+}
+
+fun registerTestCmds(){
+    bot!!.getGuildById("1309597186425622600")?.updateCommands()?.addCommands(
+        GetQuoteAutomated().getCommand(),
+
+        GetQuote().getCommand(),
+        GetQuote().getUserCommand(),
+
+        AddQuote().getCommand(),
+        AddQuote().getMessageContextCommand(),
+
+        SetAutomatedQuote().getCommand()
+    )?.queue()
 }
 
 class Instance {
     companion object {
         var bot: JDA? = null
         var env: Dotenv? = null
-        var logger: Logger = Logger.getLogger("Instance-Bot")
+        var logger: Logger = Logger.getLogger("Quote-Discord-Bot")
     }
 }

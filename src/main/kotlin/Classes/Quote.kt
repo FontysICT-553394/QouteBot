@@ -122,10 +122,6 @@ class Quote {
                     val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy");
                     embed.addField("Relevance Date:", simpleDateFormat.format(dateSaid), true)
                 }
-                QuoteType.WEEK -> {
-                    val simpleDateFormat = SimpleDateFormat("ww-yyyy");
-                    embed.addField("Relevance Week:", simpleDateFormat.format(dateSaid), true)
-                }
                 QuoteType.MONTH -> {
                     val simpleDateFormat = SimpleDateFormat("MM-yyyy");
                     embed.addField("Relevance Month:", simpleDateFormat.format(dateSaid), true)
