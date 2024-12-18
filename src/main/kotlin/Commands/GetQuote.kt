@@ -147,18 +147,27 @@ class GetQuote : ListenerAdapter() {
     }
 
     private fun getAllReasonEmbed(user: User): EmbedBuilder {
-        val quotes = Database.getUserQuotes(DiscordUser(user))
+        try{
+            val quotes = Database.getUserQuotes(DiscordUser(user))
 
-        val embed = EmbedBuilder()
-        embed.setTitle("${user.effectiveName}'s quotes:")
-        embed.setDescription("This user has ${quotes.count()} quotes.")
-        embed.setThumbnail(user.effectiveAvatarUrl)
-        embed.setColor(Color.GREEN)
+            val embed = EmbedBuilder()
+            embed.setTitle("${user.effectiveName}'s quotes:")
+            embed.setDescription("This user has ${quotes.count()} quotes.")
+            embed.setThumbnail(user.effectiveAvatarUrl)
+            embed.setColor(Color.GREEN)
 
-        quotes.forEach { quote ->
-            embed.addField("Quote ${quote.quoteId}:", quote.quote!!,true)
+            quotes.forEach { quote ->
+                embed.addField("Quote ${quote.quoteId}:", quote.quote!!,true)
+            }
+
+            return embed
+            //TODO: page stuff later maybe
+        }catch (e: Exception){
+            val embed = EmbedBuilder()
+            embed.setTitle("404 Quotes Not Found")
+            embed.setDescription("No quotes could be found for this user.")
+            embed.setColor(Color.RED)
+            return embed
         }
-        return embed
-        // implement page stuff later
     }
 }

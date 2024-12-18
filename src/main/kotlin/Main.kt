@@ -19,12 +19,12 @@ fun main() {
     setupEnv()
     startBot()
     registerCommands()
-//    registerTestCmds()
+    registerTestCmds()
 }
 
 fun startBot(){
     bot = JDABuilder.createDefault(env!!.get("BOT_TOKEN"))
-        .setActivity(Activity.competing("in the war against viktor!"))
+        .setActivity(Activity.playing("all your quotes"))
         .addEventListeners(
             GetQuoteAutomated(),
             GetQuote(),
@@ -53,8 +53,12 @@ fun registerCommands(){
         AddQuote().getCommand(),
         AddQuote().getMessageContextCommand(),
 
-        SetAutomatedQuote().getCommand()
-    ).queue();
+        SetAutomatedQuote().getCommand(),
+        SetAutomatedQuote().getMessageContextCommand()
+    ).queue(
+        { println("Commands registered successfully!") },
+        { error -> println("Command registration failed: ${error.message}") }
+    )
 }
 
 fun registerTestCmds(){
@@ -67,7 +71,8 @@ fun registerTestCmds(){
         AddQuote().getCommand(),
         AddQuote().getMessageContextCommand(),
 
-        SetAutomatedQuote().getCommand()
+        SetAutomatedQuote().getCommand(),
+        SetAutomatedQuote().getMessageContextCommand()
     )?.queue()
 }
 
