@@ -38,6 +38,9 @@ class GetQuote : ListenerAdapter() {
 
     fun getUserCommand(): CommandData {
         return Commands.user("Get user quotes")
+            .setIntegrationTypes(IntegrationType.ALL)
+            .setContexts(InteractionContextType.ALL)
+            .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {

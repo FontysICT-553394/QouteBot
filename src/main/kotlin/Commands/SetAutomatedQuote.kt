@@ -45,6 +45,9 @@ class SetAutomatedQuote : ListenerAdapter() {
 
     fun getMessageContextCommand(): CommandData {
         return Commands.message("Make quote of the XXXX")
+            .setIntegrationTypes(IntegrationType.ALL)
+            .setContexts(InteractionContextType.ALL)
+            .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {

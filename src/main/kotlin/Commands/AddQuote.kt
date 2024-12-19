@@ -32,6 +32,9 @@ class AddQuote : ListenerAdapter() {
 
     fun getMessageContextCommand(): CommandData {
         return Commands.message("Add Quote")
+            .setIntegrationTypes(IntegrationType.ALL)
+            .setContexts(InteractionContextType.ALL)
+            .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
