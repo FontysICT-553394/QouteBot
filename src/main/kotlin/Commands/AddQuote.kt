@@ -51,7 +51,7 @@ class AddQuote : ListenerAdapter() {
         )
 
         val embed = addQuote(quote)
-        event.replyEmbeds(embed.build()).setEphemeral(true).setEphemeral(true).queue()
+        event.replyEmbeds(embed.build()).setEphemeral(true).queue()
     }
 
     override fun onMessageContextInteraction(event: MessageContextInteractionEvent) {
@@ -68,7 +68,7 @@ class AddQuote : ListenerAdapter() {
         )
 
         val embed = addQuote(quote)
-        event.replyEmbeds(embed.build()).setEphemeral(true).setEphemeral(true).queue()
+        event.replyEmbeds(embed.build()).setEphemeral(true).queue()
     }
 
     private fun addQuote(quote: Quote): EmbedBuilder {

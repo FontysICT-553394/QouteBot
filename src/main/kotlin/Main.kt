@@ -51,6 +51,7 @@ fun registerCommands(){
 
         GetQuote().getCommand(),
         GetQuote().getUserCommand(),
+        GetQuote().getUserCommandEphemeral(),
 
         AddQuote().getCommand(),
         AddQuote().getMessageContextCommand(),

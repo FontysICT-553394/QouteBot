@@ -43,6 +43,13 @@ class GetQuote : ListenerAdapter() {
             .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
     }
 
+    fun getUserCommandEphemeral(): CommandData {
+        return Commands.user("Get user quotes ephemeral")
+            .setIntegrationTypes(IntegrationType.ALL)
+            .setContexts(InteractionContextType.ALL)
+            .setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+    }
+
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if(event.name != "quote-user") {
             return
@@ -62,11 +69,18 @@ class GetQuote : ListenerAdapter() {
     }
 
     override fun onUserContextInteraction(event: UserContextInteractionEvent) {
-        if(event.name != "Get user quotes") return
+        var ephemeral = false
+        if(event.name != "Get user quotes"){
+            if(event.name != "Get user quotes ephemeral"){
+                return
+            }else{
+                ephemeral = true
+            }
+        }
 
         val embed = getAllReasonEmbed(event.target)
         embed.setFooter(event.user.effectiveName, event.user.effectiveAvatarUrl)
-        event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+        event.replyEmbeds(embed.build()).setEphemeral(ephemeral).queue()
     }
 
     private fun randomQuote(event: SlashCommandInteractionEvent, ephemeral: Boolean) {

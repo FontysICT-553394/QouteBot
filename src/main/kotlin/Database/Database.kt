@@ -13,7 +13,6 @@ import java.time.Instant
 
 class Database {
 
-
     companion object{
         val userCache = mutableMapOf<Long, User>()
         private val jdbc = "jdbc:mysql://${Instance.env!!.get("DB_IP")}:${Instance.env!!.get("DB_PORT")}/${Instance.env!!.get("DB_NAME")}"
