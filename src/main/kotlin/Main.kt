@@ -9,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.requests.GatewayIntent
 import java.util.logging.Logger
 
 var bot: JDA? = null
@@ -25,6 +26,7 @@ fun main() {
 fun startBot(){
     bot = JDABuilder.createDefault(env!!.get("BOT_TOKEN"))
         .setActivity(Activity.playing("all your quotes"))
+        .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
         .addEventListeners(
             GetQuoteAutomated(),
             GetQuote(),

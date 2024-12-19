@@ -78,7 +78,7 @@ class AddQuote : ListenerAdapter() {
             return embed
         }catch(e:Exception){
             val embed = EmbedBuilder()
-            embed.setTitle("404 Quote Not Found")
+            embed.setTitle("500 Server Error")
             embed.setDescription("Could not upload quote.")
             embed.setColor(Color.RED)
             return embed

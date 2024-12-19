@@ -77,7 +77,7 @@ class GetQuoteAutomated : ListenerAdapter() {
     private fun sendError(event: SlashCommandInteractionEvent){
         val embed = EmbedBuilder()
         embed.setTitle("404 Quote Not Found")
-        embed.setDescription("No random quote could be found.")
+        embed.setDescription("Requested quote could not be found.")
         embed.setColor(Color.RED)
         event.replyEmbeds(embed.build()).setEphemeral(true).queue()
     }

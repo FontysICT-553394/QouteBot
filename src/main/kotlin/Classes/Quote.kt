@@ -96,11 +96,11 @@ class Quote {
      */
     fun toEmbed(requester: User, color: Color = Color.GREEN): EmbedBuilder{
         val embed = EmbedBuilder()
-        embed.setTitle("Quote ${if(quoteId == null) "" else quoteId}:")
         embed.setDescription(quote)
         embed.setColor(color)
 
         if(sender != null && !isAutomatedQuote) {
+            embed.setTitle("Quote ${if(quoteId == null) "" else quoteId}:")
             embed.setThumbnail(sender!!.avatarUrl)
             embed.setFooter(requester.effectiveName, requester.effectiveAvatarUrl)
             embed.addField("Sender:", sender!!.displayName!!, true)
@@ -114,6 +114,7 @@ class Quote {
         }
 
         if(isAutomatedQuote){
+            embed.setTitle("Quote of the ${quoteType.toString().lowercase()}:")
             embed.setFooter(requester.effectiveName, requester.effectiveAvatarUrl)
             embed.setThumbnail(Instance.env!!.get("BOT_PFP"))
             embed.addField("Sender:", "QuoteBot", true)

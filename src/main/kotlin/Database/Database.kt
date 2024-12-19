@@ -4,13 +4,10 @@ import com.beauver.discord.bots.Classes.DiscordUser
 import com.beauver.discord.bots.Classes.Quote
 import com.beauver.discord.bots.Enums.QuoteType
 import com.beauver.discord.bots.Instance
-import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date
 import net.dv8tion.jda.api.entities.User
 import java.sql.Connection
 import java.sql.Date
 import java.sql.DriverManager
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.text.SimpleDateFormat
 import java.time.Instant
 
@@ -21,9 +18,9 @@ class Database {
         val userCache = mutableMapOf<Long, User>()
         private val jdbc = "jdbc:mysql://${Instance.env!!.get("DB_IP")}:${Instance.env!!.get("DB_PORT")}/${Instance.env!!.get("DB_NAME")}"
 
-        val currentQotd: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli())) }
-        val currentQotm: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli())) }
-        val currentQoty: Quote by lazy { getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli())) }
+        var currentQotd: Quote by MutableLazy { getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli())) }
+        var currentQotm: Quote by MutableLazy { getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli())) }
+        var currentQoty: Quote by MutableLazy { getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli())) }
 
         private fun getConnection(): Connection {
             return DriverManager.getConnection(jdbc, Instance.env!!.get("DB_USER"), Instance.env!!.get("DB_PWD"));
@@ -124,6 +121,52 @@ class Database {
             if(stmt.executeUpdate() <= 0){
                 throw RuntimeException("Quote could not be created.")
             }
+        }
+
+        fun updateAutomaticQuoteDatabase(quote: Quote, oldQuote: Quote){
+            val conn = getConnection()
+
+            val stmt = conn.prepareStatement(
+                    "UPDATE quotes SET quote = ? " +
+                            "WHERE automated = true " +
+                            "AND quote_type = ? " +
+                            "AND quote = ?"
+            )
+            stmt.setString(1, quote.quote)
+            stmt.setString(2, quote.quoteType.toString().uppercase())
+            stmt.setString(3, oldQuote.quote)
+
+            val rs = stmt.executeUpdate()
+
+            if(rs <= 0){
+                throw RuntimeException("Quote could not be updated")
+            }
+
+            currentQotd = getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli()))
+            currentQotm = getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli()))
+            currentQoty = getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli()))
+        }
+
+        fun addAutomaticQuoteDatabase(quote: Quote){
+            val conn = getConnection()
+
+            val stmt = conn.prepareStatement(
+                "INSERT INTO quotes(quote, sender_id, guild_id, date, quote_type, automated)" +
+                        "VALUES (?,1318175554557710336,0,?,?,true)")
+
+            stmt.setString(1, quote.quote)
+            stmt.setDate(2, Date(quote.dateSaid!!.time))
+            stmt.setString(3, quote.quoteType.toString().uppercase())
+
+            val rs = stmt.executeUpdate();
+
+            if(rs <= 0){
+                throw RuntimeException("Quote could not be sent to database.")
+            }
+
+            currentQotd = getAutomaticQuoteDatabase(QuoteType.DAY, Date(Instant.now().toEpochMilli()))
+            currentQotm = getAutomaticQuoteDatabase(QuoteType.MONTH, Date(Instant.now().toEpochMilli()))
+            currentQoty = getAutomaticQuoteDatabase(QuoteType.YEAR, Date(Instant.now().toEpochMilli()))
         }
 
         private fun getAutomaticQuoteDatabase(quoteType: QuoteType, date: Date): Quote {
