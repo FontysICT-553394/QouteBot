@@ -22,6 +22,8 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 import net.dv8tion.jda.api.interactions.modals.Modal
 import java.awt.Color
 import java.time.Instant
+import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 
 
@@ -105,23 +107,43 @@ class SetAutomatedQuote : ListenerAdapter() {
                 QuoteType.valueOf(quoteType)
             )
 
-            try{
-                Database.updateAutomaticQuoteDatabase(newQuote, oldQuote)
-                println("Updated quote of the $quoteType")
+            if(LocalDate.from(oldQuote.dateSaid!!.toInstant()).dayOfYear == LocalDate.from(newQuote.dateSaid!!.toInstant()).dayOfYear) {
+                try{
+                    Database.updateAutomaticQuoteDatabase(newQuote, oldQuote)
+                    println("Updated quote of the $quoteType")
 
-                val embed = EmbedBuilder()
-                embed.setTitle("200 OK")
-                embed.setDescription("Successfully uploaded the new quote")
-                embed.setColor(Color.GREEN)
-                event.replyEmbeds(embed.build()).setEphemeral(true).queue()
-            }catch(e:Exception){
-                val embed = EmbedBuilder()
-                embed.setTitle("500 Server Error")
-                embed.setDescription("Could not upload quote.")
-                embed.setColor(Color.RED)
-                event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+                    val embed = EmbedBuilder()
+                    embed.setTitle("200 OK")
+                    embed.setDescription("Successfully uploaded the new quote")
+                    embed.setColor(Color.GREEN)
+                    event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+                }catch(e:Exception){
+                    val embed = EmbedBuilder()
+                    embed.setTitle("500 Server Error")
+                    embed.setDescription("Could not upload quote.")
+                    embed.setColor(Color.RED)
+                    event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+                }
+            }else{
+                try{
+                    Database.addAutomaticQuoteDatabase(newQuote)
+                    println("Added quote of the $quoteType")
+
+                    val embed = EmbedBuilder()
+                    embed.setTitle("200 OK")
+                    embed.setDescription("Successfully uploaded the new quote")
+                    embed.setColor(Color.GREEN)
+                    event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+                }catch (e: Exception){
+                    val embed = EmbedBuilder()
+                    embed.setTitle("500 Server Error")
+                    embed.setDescription("Could not upload quote.")
+                    embed.setColor(Color.RED)
+                    event.replyEmbeds(embed.build()).setEphemeral(true).queue()
+                }
             }
         }catch (e: Exception){
+            //if it can't get the quote
             val newQuote = Quote(
                 quoteText,
                 Date.from(Instant.now()),
