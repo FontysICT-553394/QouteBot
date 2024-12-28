@@ -1,0 +1,26 @@
+name: Build Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # Use your preferred JDK distribution
+          java-version: '21' # Specify the version you need
+
+      - name: Build with Gradle
+        run: ./gradlew build
