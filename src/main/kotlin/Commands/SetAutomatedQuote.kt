@@ -87,8 +87,7 @@ class SetAutomatedQuote : ListenerAdapter() {
             return
         }
 
-        //broken on purpose for test
-        val quoteType = event.getValue("quote-type").asString
+        val quoteType = event.getValue("quote-type")!!.asString
         val validQuoteTypes = listOf("DAY", "MONTH", "YEAR")
         if (!validQuoteTypes.contains(quoteType)) {
             val embed = EmbedBuilder()
